@@ -17,9 +17,21 @@ app.use(bodyParser.urlencoded({extended: true})); // to support URL-encoded bodi
 //routes
 app.get('/', function(req,res){
 	res.sendFile(path.join(__dirname+'/index.html'));
-})
+});
 
-app.post('/postToSlack', function(req,res){
+app.get('/help/:id'), function(req, res) {
+	// slack oauth // stretch goal for now
+	// Pull the unique stuff out.
+	var id = req.params.id;
+	// Parse into userID and request number.
+	// Search userapp for userid
+	// find request number
+	// fetch info from relevant request
+	// 
+
+}
+
+app.post('/postToSlack', function(req, res) {
 	var service = req.body.service;
 	var gender = req.body.gender;
 	var age = req.body.age;
@@ -47,7 +59,7 @@ app.post('/postToSlack', function(req,res){
 
 	slack.send(message,errorHandler);
 
-})
+});
 
 
 
