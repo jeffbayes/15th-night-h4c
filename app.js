@@ -32,7 +32,7 @@ app.post('/postToSlack', function(req, res) {
 	var fallbackText = push + "Service: ";
 	var basicText = service + ". " + gender + ", age " + age + ".";
 
-	var requestURL = "www.15thnight.com/userID-requestID";
+	var requestURL = "localhost:3000/userID-requestID";
 	var extras = "\nFollow the link to accept the request: " + requestURL;
 
 	basicText += extras;
@@ -54,7 +54,7 @@ app.post('/postToSlack', function(req, res) {
 		attachments: [{
 			fallback: fallbackText + basicText,
 			title: "<!channel>: New request for " + service + ".",
-			title_link: "https://www.google.com/" + hashArray[0] + "-" + hashArray[1],
+			title_link: requestURL,
 			text: basicText,
 			color: "#7CD197"
 		}]
