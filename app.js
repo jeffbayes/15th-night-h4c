@@ -36,54 +36,58 @@ app.get('/help/:id', function(req, res) {
 
 
 app.post('/postToSlack/:key?', function(req, res) {
-	var requestHash = "u98n30i69qu687e-PANDA";
-	var hashArray = requestHash.split("-");
-	var service = req.body.service;
-	var gender = req.body.gender;
-	var age = req.body.age;
-	var push = "<!channel> -- ";
-	var fallbackText = push + "Service: ";
-	var basicText = service + ". " + gender + ", age " + age + ".";
-
-	var requestURL = "http://localhost:3000/help/userID-requestID";
-	var extras = "\nFollow the link to accept the request: " + requestURL;
-
-	basicText += extras;
-
-	// now we will post a message to slack to let people know a new user signed up!
-	var message = {
-	  channel: '#shelter',
-	  icon_emoji: ':house:',
-	  username: "HELP REQUEST",
-	  title: "HELP REQUEST",
-	  text: fallbackText + basicText
-	  // username: 'Hal 9000'
-	};
-
-	var fancyMessage = {
-	  	channel: '#shelter',
-	  	icon_emoji: ':house:',
-	  	username: "HELP REQUEST",
-		attachments: [{
-			fallback: fallbackText + basicText,
-			title: "<!channel>: New request for " + service + ".",
-			title_link: requestURL,
-			text: basicText,
-			color: "#7CD197"
-		}]
-	}
-
-
-	var errorHandler = function(err){
-		if (err) {
-			console.log('API error:', err);
+	var userID;
+	UserApp.setToken(req.params.key);
+    UserApp.User.get({}, function(error, result){
+		if(error){
+			res.redirect('/login')
 		} else {
-			console.log('Message received!');
-			res.redirect('/');
-		}
-	};
+			userID = result[0]['user_id'];
 
-	slack.send(fancyMessage, errorHandler);
+			console.log(resut);
+
+			var rand = parseInt(Math.random() * 10000);
+			var requestID = userID + "-" + rand;
+			console.log(requestID);
+
+			var service = req.body.service;
+			var gender = req.body.gender;
+			var age = req.body.age;
+			var push = "<!channel> -- ";
+			var fallbackText = push + "Service: ";
+			var basicText = service + ". " + gender + ", age " + age + ".";
+
+			var requestURL = "http://localhost:3000/help/" + requestID;
+			var extras = "\nFollow the link to accept the request: " + requestURL;
+
+			basicText += extras;
+
+			var fancyMessage = {
+			  	channel: '#shelter',
+			  	icon_emoji: ':house:',
+			  	username: "HELP REQUEST",
+				attachments: [{
+					fallback: fallbackText + basicText,
+					title: "<!channel>: New request for " + service + ".",
+					title_link: requestURL,
+					text: basicText,
+					color: "#7CD197"
+				}]
+			}
+
+
+			var errorHandler = function(err){
+				if (err) {
+					console.log('API error:', err);
+				} else {
+					console.log('Message received!');
+					res.redirect('/');
+				}
+			};
+
+			slack.send(fancyMessage, errorHandler);
+		}
+    });
 
 });
 
