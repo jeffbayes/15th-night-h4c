@@ -32,7 +32,7 @@ app.post('/postToSlack', function(req, res) {
 	var fallbackText = push + "Service: ";
 	var basicText = service + ". " + gender + ", age " + age + ".";
 
-	var requestURL = "localhost:3000/userID-requestID";
+	var requestURL = "http://localhost:3000/help/userID-requestID";
 	var extras = "\nFollow the link to accept the request: " + requestURL;
 
 	basicText += extras;
