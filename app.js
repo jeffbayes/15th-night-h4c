@@ -20,11 +20,18 @@ app.get('/', function(req,res){
 })
 
 app.post('/postToSlack', function(req,res){
-	var message = req.body.message;
+	var service = req.body.service;
+	var gender = req.body.gender;
+	var age = req.body.age;
+	var push = "<!channel> -- ";
+	var message = push + "Service: " + service + ". " + gender + ", age " + age + ".";
 
 	// now we will post a message to slack to let people know a new user signed up!
 	var message = {
 	  channel: '#shelter',
+	  icon_emoji: ':house:',
+	  username: "HELP REQUEST",
+	  title: "HELP REQUEST",
 	  text:  message
 	  // username: 'Hal 9000'
 	};
