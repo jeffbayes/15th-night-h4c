@@ -5,8 +5,14 @@ var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser');
 
+
 var MY_SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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';
 var slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
+
+var UserApp = require('userapp');
+UserApp.initialize({
+	appId: "56bf8c06a0f39"
+});
 
 //Initilization
 var app = express();
@@ -15,21 +21,6 @@ app.use(bodyParser.urlencoded({extended: true})); // to support URL-encoded bodi
 
 
 //routes
-app.get('/', function(req,res){
-	res.sendFile(path.join(__dirname+'/index.html'));
-});
-
-app.get('/help/:id'), function(req, res) {
-	// slack oauth // stretch goal for now
-	// Pull the unique stuff out.
-	var id = req.params.id;
-	// Parse into userID and request number.
-	// Search userapp for userid
-	// find request number
-	// fetch info from relevant request
-	// 
-
-}
 
 app.post('/postToSlack', function(req, res) {
 	var requestHash = "u98n30i69qu687e-PANDA";
@@ -82,6 +73,44 @@ app.post('/postToSlack', function(req, res) {
 	slack.send(fancyMessage, errorHandler);
 
 });
+
+app.get('/login', function(req, res){
+	res.sendFile(path.join(__dirname+'/login.html'));
+})
+
+
+app.get('/:key?', function(req,res){
+
+	UserApp.setToken(req.params.key);
+    UserApp.User.get({}, function(error, result){
+		if(!error){
+			res.sendFile(path.join(__dirname+'/index.html'));
+		}else{
+			res.redirect('/login')
+		}
+    })	
+});
+
+app.get('/help/:id'), function(req, res) {
+	// slack oauth // stretch goal for now
+	// Pull the unique stuff out.
+	var id = req.params.id;
+	// Parse into userID and request number.
+	// Search userapp for userid
+	// find request number
+	// fetch info from relevant request
+	// 
+
+}
+
+
+
+app.get('/invite/:user', function(req, res){
+	// require login
+	res.sendFile(path.join(__dirname+'/invite.html'));
+})
+
+
 
 
 
