@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({extended: true})); // to support URL-encoded bodi
 
 //routes
 
-app.get('/help/:id'), function(req, res) {
+app.get('/help/1', function(req, res) {
 	// slack oauth // stretch goal for now
 	// Pull the unique stuff out.
 	var id = req.params.id;
@@ -33,7 +33,7 @@ app.get('/help/:id'), function(req, res) {
 	// fetch info from relevant request
 	// 
 
-}
+});
 
 
 app.post('/postToSlack', function(req, res) {
