@@ -22,6 +22,20 @@ app.use(bodyParser.urlencoded({extended: true})); // to support URL-encoded bodi
 
 //routes
 
+app.get('/help/:id'), function(req, res) {
+	// slack oauth // stretch goal for now
+	// Pull the unique stuff out.
+	var id = req.params.id;
+	res.sendFile(path.join(__dirname+'/help.html'));
+	// Parse into userID and request number.
+	// Search userapp for userid
+	// find request number
+	// fetch info from relevant request
+	// 
+
+}
+
+
 app.post('/postToSlack', function(req, res) {
 	var requestHash = "u98n30i69qu687e-PANDA";
 	var hashArray = requestHash.split("-");
@@ -90,19 +104,6 @@ app.get('/:key?', function(req,res){
 		}
     })	
 });
-
-app.get('/help/:id'), function(req, res) {
-	// slack oauth // stretch goal for now
-	// Pull the unique stuff out.
-	var id = req.params.id;
-	// Parse into userID and request number.
-	// Search userapp for userid
-	// find request number
-	// fetch info from relevant request
-	// 
-
-}
-
 
 
 app.get('/invite/:user', function(req, res){
