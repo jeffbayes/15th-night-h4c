@@ -5,7 +5,6 @@ var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser');
 
-
 var MY_SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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';
 var slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
 
@@ -31,7 +30,7 @@ app.get('/help/:id', function(req, res) {
 	// Search userapp for userid
 	// find request number
 	// fetch info from relevant request
-	// 
+	// fetch info about requester
 
 });
 
