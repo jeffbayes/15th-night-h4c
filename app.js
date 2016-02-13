@@ -32,11 +32,19 @@ app.get('/help/:id'), function(req, res) {
 }
 
 app.post('/postToSlack', function(req, res) {
+	var requestHash = "u98n30i69qu687e-PANDA";
+	var hashArray = requestHash.split("-");
 	var service = req.body.service;
 	var gender = req.body.gender;
 	var age = req.body.age;
 	var push = "<!channel> -- ";
-	var message = push + "Service: " + service + ". " + gender + ", age " + age + ".";
+	var fallbackText = push + "Service: ";
+	var basicText = service + ". " + gender + ", age " + age + ".";
+
+	var requestURL = "www.15thnight.com/userID-requestID";
+	var extras = "\nFollow the link to accept the request: " + requestURL;
+
+	basicText += extras;
 
 	// now we will post a message to slack to let people know a new user signed up!
 	var message = {
@@ -44,9 +52,23 @@ app.post('/postToSlack', function(req, res) {
 	  icon_emoji: ':house:',
 	  username: "HELP REQUEST",
 	  title: "HELP REQUEST",
-	  text:  message
+	  text: fallbackText + basicText
 	  // username: 'Hal 9000'
 	};
+
+	var fancyMessage = {
+	  	channel: '#shelter',
+	  	icon_emoji: ':house:',
+	  	username: "HELP REQUEST",
+		attachments: [{
+			fallback: fallbackText + basicText,
+			title: "<!channel>: New request for " + service + ".",
+			title_link: "https://www.google.com/" + hashArray[0] + "-" + hashArray[1],
+			text: basicText,
+			color: "#7CD197"
+		}]
+	}
+
 
 	var errorHandler = function(err){
 		if (err) {
@@ -57,7 +79,7 @@ app.post('/postToSlack', function(req, res) {
 		}
 	};
 
-	slack.send(message,errorHandler);
+	slack.send(fancyMessage, errorHandler);
 
 });
 
