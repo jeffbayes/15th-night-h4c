@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	<script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<script src="https://app.userapp.io/js/userapp.client.js"></script>
+</head>
+<body class="container">
+	
+	<h1 class="text-center">15th Night</h1>
+	login:
+	<form id="login">
+		<input type="text" name="login" value="sally@gmail.com">
+		<input type="password" name="password" value="password">
+		<input type="submit">
+	</form>
+<div id="msg"></div>
+	<script>
+	UserApp.initialize({ appId: "56bf8c06a0f39" });
+
+	$( "#login" ).submit(function( event ) {
+		var res =  $( this ).serializeArray();
+		console.log(res);
+		event.preventDefault();
+		UserApp.User.login({ "login": res[0].value, "password": res[1].value }, function(error, result) {
+		    if (error) {
+		        // Something went wrong...
+		        // Check error.name. Might just be a wrong password?
+		        console.log(error);
+		        $('#msg').html(error.message)
+		    } else if (result.locks && result.locks.length > 0) {
+		        $('#msg').html('locked')
+		    } else {
+		        // User is logged in, save result.token in a cookie called 'ua_session_token'
+		        console.log(UserApp.User());
+		        window.location.href = '/'+ result.token
+		       
+
+		    }
+		});
+	 
+	});
+	</script>
+</body>
+</html>
