@@ -35,7 +35,7 @@ app.get('/help/:id', function(req, res) {
 });
 
 
-app.post('/postToSlack', function(req, res) {
+app.post('/postToSlack/:key?', function(req, res) {
 	var requestHash = "u98n30i69qu687e-PANDA";
 	var hashArray = requestHash.split("-");
 	var service = req.body.service;
