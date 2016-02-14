@@ -66,12 +66,19 @@ app.post('/msg', function(req,res){
 	// Use Smtp Protocol to send Email
     var transporter = nodemailer.createTransport('smtps://nwpointer%40gmail.com:RNs1120!!@smtp.gmail.com');
 
+
+	if(p.addendum){
+		p.message += "<br/><br/><br/>" + p.addendum +
+		"<br>" + "username: " + p.email +
+		"<br><br>" + "click here to login " + 
+		req.protocol + '://' + req.get('host') + "/login" 
+	}
     // setup e-mail data with unicode symbols
     var mailOptions = {
         from: '15th night provider', // sender address
         to: p.email, // list of receivers
         subject: p.subject, // Subject line
-        text: p.message, // plaintext body
+        html: p.message, // plaintext body
         
     };
 
