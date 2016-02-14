@@ -258,10 +258,16 @@ $('h3').each(function(i,h){
 
 var getToken = function(source){
 	var components = (source.split('/'));
+	if (components[components.length-1].indexOf('%') >= 0) {
+		// if it has a % (enncoded whitespace), it's not our user ID
+		console.log("YOU MADE IT HERE!")
+		return components[components.length-2];
+	}
+	console.log("NOT IN IF.");
 	return components[components.length-1];
 }
-
-console.log(getToken(window.location.href))
+console.log("HERE IS THE GET TOKEN CONSOLE LOG BROOOOOOO");
+console.log(getToken(window.location.href));
 $('#request').attr(
 	"action", 
 	$('#request').attr('action') + "/" + getToken(window.location.href)

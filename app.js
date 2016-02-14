@@ -34,19 +34,14 @@ app.get('/help/:id', function(req, res) {
 	// slack oauth // stretch goal for now
 	// Pull the unique stuff out.
 	var requestID = req.params.id;
-	console.log(requestID);
 	var requestArray = requestID.split('-');
-	console.log(requestArray[0]);
-	console.log(requestArray[1]);
 	// REPLACE BEFORE PRODUCTION. IT HAS SEEN THE LIGHT OF DAY.
 	UserApp.setToken("x-WrIq6UQC20sI2a-a8bMg");
 	UserApp.User.get({"user_id": requestArray[0]}, function(error, result){
 		if(!error){
-			console.log(result[0])
 			var userEmail = result[0]['email']
 			var userPhone = result[0]['properties']['phone']['value'];
 			var userRequests = JSON.parse(result[0]['properties']['requests']['value']);
-			console.log(userRequests)
 			var theRequest = userRequests.map(function(item){
 				if (item['id'] == requestArray[1]){
 					res.render('help', {phone: userPhone, email: userEmail, info: item['text']});
@@ -80,7 +75,7 @@ app.post('/help/close/:id', function(req, res) {
 
 	UserApp.User.get({"user_id": requestArray[0]}, function(error, result){
 		if(!error) {
-			console.log(result[0])
+			console.log(result[0]['properties'])
 			userEmail = result[0]['email']
 			userPhone = result[0]['properties']['phone']['value'];
 			var userRequests = JSON.parse(result[0]['properties']['requests']['value']);
@@ -100,14 +95,11 @@ app.post('/help/close/:id', function(req, res) {
 					SlackAPI.api('search.messages', { 
 						query: requestID
 					}, function(err, resp){
-						console.log(resp);
 						var match = resp['messages']['matches'][0];
-						console.log(match);
 						SlackAPI.api('chat.delete', {
 							ts: match['ts'],
 							channel: match['channel']['id']
 						}, function(err, response){
-							console.log(response);
 							var messageText = "Recent request #" + requestArray[1] + " has been fulfilled. Thank you!";
 							var fancyMessage = {
 				  				channel: '#shelter',
@@ -130,7 +122,6 @@ app.post('/help/close/:id', function(req, res) {
 							};
 							slack.send(fancyMessage, errorHandler);
 						})
-						console.log(match);
 					});
 				}, 14000);
 				res.redirect("/confirm/" + encodeURIComponent(userEmail) + "/" + encodeURIComponent(userPhone)
@@ -160,6 +151,7 @@ app.get("/confirm/:mail/:phone/:info", function(req, res) {
 app.post('/postToSlack/:key?', function(req, res) {
 	var userID;
 	UserApp.setToken(req.params.key);
+	console.log(req.params.key);
     UserApp.User.get({}, function(error, result){
 		if(error){
 			res.redirect('/login')
@@ -212,7 +204,7 @@ app.post('/postToSlack/:key?', function(req, res) {
 					console.log('API error:', err);
 				} else {
 					console.log('Message received!');
-					res.redirect('/request/'+req.params.key+"/"+" message recieved");
+					res.redirect('/request/'+req.params.key+"/"+"Message has been sent to the 15th Night network.");
 				}
 			};
 			slack.send(fancyMessage, errorHandler);
