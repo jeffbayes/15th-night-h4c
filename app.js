@@ -6,6 +6,7 @@ var exphbs = require('express-handlebars');
 var path = require('path');
 var bodyParser = require('body-parser');
 var nodemailer = require('nodemailer');
+var Slack = require('slack-api');
 
 // Slack Dependencies
 var Slack = require('slack-node');
@@ -59,6 +60,30 @@ app.get('/msg', function(req,res){
 	return res.render('msg', {});
 })
 
+// app.get('/oath', function(req,res){
+// 	Slack.oauth.getUrl({
+// 		client_id: 21255113202.21323804660,
+// 		scope: "user:read",
+// 	},function(error, result){
+// 		console.log(error, result);
+
+// 	})
+// })
+
+// app.get('/catch', function(req,res){
+// 	console.log("code:", req.params);
+// 	if(req.params){
+// 		res.redirect("https://slack.com/api/oauth.access?client_id=21255113202.21323804660&client_secret=51d2acbcbe270f4f5ecde319b0154c0b&code="+req.params.code+"&redirect_uri=localhost:3000/catcher")
+// 	}
+// 	// 21255113202.21323804660
+// 	// 51d2acbcbe270f4f5ecde319b0154c0b
+// 	// res.redirect("https://slack.com/api/oauth.access?client_id=21255113202.21323804660&client_secret=51d2acbcbe270f4f5ecde319b0154c0b&code="+req.params.code+"&redirect_uri=http://localhost:3000/catcher")
+// })
+
+app.get('/catcher', function(){
+	res.send('thanks');
+})
+
 app.post('/msg', function(req,res){
 	var p = req.body;
 	// Use Smtp Protocol to send Email
@@ -87,7 +112,7 @@ app.post('/msg', function(req,res){
         }
         console.log('Message sent: ' + info.response);
     });
-	return res.redirect(p.location)
+	return res.redirect(p.location+"/"+"sent")
 })
 
 // Helper function to remove undefined items from an array.
@@ -171,14 +196,15 @@ app.post('/help/close/:id', function(req, res) {
 	});
 });
 
-app.get("/confirm/:mail/:phone/:info", function(req, res) {
+app.get("/confirm/:mail/:phone/:info/:message?", function(req, res) {
 	var encodedEmail = req.params.mail;
 	var encodedPhone = req.params.phone;
 	var encodedInfo = req.params.info;
+	var message    = req.params.message || {};
 	var email = decodeURIComponent(encodedEmail);
 	var phone = decodeURIComponent(encodedPhone);
 	var info = decodeURIComponent(encodedInfo);
-	res.render('helpConfirm', {email: email, phone: phone, info: info})
+	res.render('helpConfirm', {email: email, phone: phone, info: info, message:message})
 });
 
 app.post('/postToSlack/:key?', function(req, res) {
@@ -266,11 +292,16 @@ app.get('/', function(req,res){
 	res.render('index');
 });
 
-app.get('/invite/:key', function(req, res){
+app.get('/invite/:key/:message?', function(req, res){
 	UserApp.setToken(req.params.key);
 	UserApp.User.get({},function(error,result){
 		if(result && result[0] && result[0].permissions.admin.value){
-			res.render('invite');
+			if(req.params.message){
+				res.render('invite', {message: req.params.message});
+			}else{
+				res.render('invite');
+			}
+			
 		}else{
 			res.redirect('/');
 		}

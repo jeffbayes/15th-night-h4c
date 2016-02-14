@@ -1,17 +1,3 @@
-{{#if message}}
-<br>
-	<div class="alert alert-success fade in">
-		<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-		<strong>Success!</strong> {{message}}
-	</div>
-
-	<script>
-		setTimeout(function(){
-			$( ".close" ).trigger( "click" );
-		}, 4000);
-	</script>
-{{/if}}
-
 <br>
 <form id="request" action="/postToSlack" method="post">
 
