@@ -1,59 +1,57 @@
 'use strict';
 
-//dependencies 
+// Node Dependencies
 var express = require('express');
+var exphbs = require('express-handlebars');
 var path = require('path');
 var bodyParser = require('body-parser');
-
 var nodemailer = require('nodemailer');
 
-var MY_SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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';
-var slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
-// THIS IS BAD NAMESPACING. FIX IT LATER.
+// Slack Dependencies
 var Slack = require('slack-node');
-// REMOVE BEFORE PRODUCTION. IT HAS SEEN THE LIGHT OF DAY.
-var apiToken = "xoxp-21255113202-21255543414-21308331154-232305f633";
-var SlackAPI = new Slack(apiToken);
+var SlackAPIToken = "xoxp-21255113202-21255543414-21308331154-232305f633"; // TODO: REPLACE. IT HAS SEEN A PUBLIC REPO.
+var SlackAPI = new Slack(SlackAPIToken);
+var MY_SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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';
+var SlackWebhook = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
 
+// UserApp Dependencies
 var UserApp = require('userapp');
+var UserAppToken = "x-WrIq6UQC20sI2a-a8bMg"; // TODO: REPLACE. IT HAS SEEN A PUBLIC REPO.
 UserApp.initialize({
 	appId: "56bf8c06a0f39"
 });
 
-var handlebars = require('handlebars');
-var exphbs = require('express-handlebars');
-
-//Initilization
+// Initialization
 var app = express();
 app.use(bodyParser.urlencoded({extended: true})); // to support URL-encoded bodies
 app.engine('.hbs', exphbs({extname: '.hbs', defaultLayout: 'main'}));
 app.set('view engine', '.hbs');
 
-//routes
+// Routes
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/help/:id', function(req, res) {
-	// slack oauth // stretch goal for now
-	// Pull the unique stuff out.
 	var requestID = req.params.id;
 	var requestArray = requestID.split('-');
-	// REPLACE BEFORE PRODUCTION. IT HAS SEEN THE LIGHT OF DAY.
-	UserApp.setToken("x-WrIq6UQC20sI2a-a8bMg");
+
+	UserApp.setToken(UserAppToken);
 	UserApp.User.get({"user_id": requestArray[0]}, function(error, result){
-		if(!error){
-			var userEmail = result[0]['email']
+		if (!error) {
+			// Lots of nested JSON in the response. 
+			// Console log it to relearn structure if UserApp ever changes.
+			var userEmail = result[0]['email'];
 			var userPhone = result[0]['properties']['phone']['value'];
 			var userRequests = JSON.parse(result[0]['properties']['requests']['value']);
 			var theRequest = userRequests.map(function(item){
-				if (item['id'] == requestArray[1]){
+				if (item['id'] == requestArray[1]) {
 					res.render('help', {phone: userPhone, email: userEmail, info: item['text']});
 				} else { return item; }
 			})
 		} else {
 			console.log(error);
 			console.log("Uh oh, this doesn't work! /help/:id");
+			// TODO: Redirect to a 404 page.
 		}
-
 	});
 });
 
@@ -92,6 +90,8 @@ app.post('/msg', function(req,res){
 	return res.redirect(p.location)
 })
 
+// Helper function to remove undefined items from an array.
+// Used to close help requests.
 function cleanArray(actual) {
   var newArray = new Array();
   for (var i = 0; i < actual.length; i++) {
@@ -107,9 +107,7 @@ app.post('/help/close/:id', function(req, res) {
 	var requestID = req.params.id;
 	var requestArray = requestID.split('-');
 
-	// REPLACE BEFORE PRODUCTION. IT HAS SEEN THE LIGHT OF DAY.
-	UserApp.setToken("x-WrIq6UQC20sI2a-a8bMg");
-
+	UserApp.setToken(UserAppToken);
 	UserApp.User.get({"user_id": requestArray[0]}, function(error, result){
 		if(!error) {
 			console.log(result[0]['properties'])
@@ -120,13 +118,14 @@ app.post('/help/close/:id', function(req, res) {
 			var removeRequests = userRequests.map(function(item){
 				if (item['id'] == requestArray[1]){
 					requestText = item['text'];	
+					// Don't return anything. This makes it undefined for cleanArray() to remove.
 				} else { return item; }
 			});
 			var updatedRequests = cleanArray(removeRequests);
 			result[0].properties.requests.value = JSON.stringify(updatedRequests);
 			UserApp.User.save(result[0], function(error, result){
 
-				// BRING BACK TIMEOUT FOR PRODUCTION. A QUICK RESPONSE DOESN'T WORK FOR SLACK.
+				// BRING BACK TIMEOUT FOR PRODUCTION. NO THERAC-25 BUGS!!
 				// MAYBE REMOVE FOR DEMO.
 				setTimeout(function() {
 					SlackAPI.api('search.messages', { 
@@ -157,8 +156,8 @@ app.post('/help/close/:id', function(req, res) {
 									console.log('Message received!');
 								}
 							};
-							slack.send(fancyMessage, errorHandler);
-						})
+							SlackWebhook.send(fancyMessage, errorHandler);
+						});
 					});
 				}, 14000);
 				res.redirect("/confirm/" + encodeURIComponent(userEmail) + "/" + encodeURIComponent(userPhone)
@@ -166,10 +165,11 @@ app.post('/help/close/:id', function(req, res) {
 			});
 		} else {
 			console.log(error);
-			console.log("Uh oh, this doesn't work! /help/close/:id");
+			console.log("ERROR IN ROUTE /help/close/:id");
+			res.redirect("/help/" + requestID);
 		}
 	});
-})
+});
 
 app.get("/confirm/:mail/:phone/:info", function(req, res) {
 	var encodedEmail = req.params.mail;
@@ -179,11 +179,7 @@ app.get("/confirm/:mail/:phone/:info", function(req, res) {
 	var phone = decodeURIComponent(encodedPhone);
 	var info = decodeURIComponent(encodedInfo);
 	res.render('helpConfirm', {email: email, phone: phone, info: info})
-	console.log("=====================================");
-	console.log("=====================================");
-	// res.redirect("/");
-})
-
+});
 
 app.post('/postToSlack/:key?', function(req, res) {
 	var userID;
@@ -191,7 +187,8 @@ app.post('/postToSlack/:key?', function(req, res) {
 	console.log(req.params.key);
     UserApp.User.get({}, function(error, result){
 		if(error){
-			res.redirect('/login')
+			// TODO: Error message for graceful handling.
+			res.redirect('/login');
 		} else {
 			userID = result[0]['user_id'];
 
@@ -215,61 +212,59 @@ app.post('/postToSlack/:key?', function(req, res) {
 			console.log(result[0].properties.requests.value);
 		
 			UserApp.User.save(result[0], function(error, result){
-				console.log(error, result);
-			})
-
-			var requestURL = "http://localhost:3000/help/" + requestID;
-			var extras = "\nFollow the link to accept the request: " + requestURL;
-
-			basicText += extras;
-
-			var fancyMessage = {
-			  	channel: '#shelter',
-			  	icon_emoji: ':house:',
-			  	username: "HELP REQUEST",
-				attachments: [{
-					fallback: fallbackText + basicText,
-					title: "<!channel>: New request for " + service + ".",
-					title_link: requestURL,
-					text: basicText,
-					color: "#38B0DE"
-				}]
-			}
-
-			var errorHandler = function(err){
-				if (err) {
-					console.log('API error:', err);
+				if (error) {
+					res.redirect('/request/' + req.params.key + '/ERROR: Failed to send message. You may try again immediately.');
 				} else {
-					console.log('Message received!');
-					res.redirect('/request/'+req.params.key+"/"+"Message has been sent to the 15th Night network.");
+					var requestURL = "http://localhost:3000/help/" + requestID;
+					var extras = "\nFollow the link to accept the request: " + requestURL;
+					basicText += extras;
+
+					var fancyMessage = {
+					  	channel: '#shelter',
+					  	icon_emoji: ':house:',
+					  	username: "HELP REQUEST",
+						attachments: [{
+							fallback: fallbackText + basicText,
+							title: "<!channel>: New request for " + service + ".",
+							title_link: requestURL,
+							text: basicText,
+							color: "#38B0DE"
+						}]
+					}
+
+					var errorHandler = function(err){
+						if (err) {
+							console.log('API error:', err);
+						} else {
+							console.log('Message received!');
+							res.redirect('/request/'+req.params.key+"/"+"Message has been sent to the 15th Night network.");
+						}
+					};
+					SlackWebhook.send(fancyMessage, errorHandler);
 				}
-			};
-			slack.send(fancyMessage, errorHandler);
+			})
 		}
     });
 });
 
 app.get('/login', function(req, res){
 	res.render('login');
-})
-
+});
 
 app.get('/request/:key?/:message?', function(req,res){
-
 	UserApp.setToken(req.params.key);
     UserApp.User.get({}, function(error, result){
-		if(!error){
+		if (!error) {
 			res.render('request', {message: req.params.message});
-		}else{
+		} else {
 			res.redirect('/login')
 		}
-    })	
+    });
 });
 
 app.get('/', function(req,res){
 	res.render('index');
-})
-
+});
 
 app.get('/invite/:key', function(req, res){
 	UserApp.setToken(req.params.key);
@@ -279,17 +274,11 @@ app.get('/invite/:key', function(req, res){
 		}else{
 			res.redirect('/');
 		}
-	})
-	// require login
-	
-})
+	});
+});
 
 
-
-
-
-
-// start server ie "node app.js"
+// Start Server - "node app.js"
 var server = app.listen(3000, function(){
 	var host = server.address().address;
 	var port = server.address().port;
