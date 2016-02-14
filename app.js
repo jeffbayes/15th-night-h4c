@@ -13,9 +13,14 @@ UserApp.initialize({
 	appId: "56bf8c06a0f39"
 });
 
+var handlebars = require('handlebars');
+var exphbs = require('express-handlebars');
+
 //Initilization
 var app = express();
 app.use(bodyParser.urlencoded({extended: true})); // to support URL-encoded bodies
+app.engine('.hbs', exphbs({extname: '.hbs'}));
+app.set('view engine', '.hbs');
 
 
 
@@ -24,8 +29,18 @@ app.use(bodyParser.urlencoded({extended: true})); // to support URL-encoded bodi
 app.get('/help/:id', function(req, res) {
 	// slack oauth // stretch goal for now
 	// Pull the unique stuff out.
-	var id = req.params.id;
-	res.sendFile(path.join(__dirname+'/help.html'));
+	var requestID = req.params.id;
+	var requestArray = requestID.split('-');
+	UserApp.User.get({user_id: requestArray[0]}, function(error, result){
+		if(error){
+			console.log("Uh oh, this doesn't work! /help/:id");
+		} else {
+			userPhone = result[0]['properties']['phone']['value'];
+
+		}
+
+	});
+	res.render('help');
 	// Parse into userID and request number.
 	// Search userapp for userid
 	// find request number
@@ -44,7 +59,7 @@ app.post('/postToSlack/:key?', function(req, res) {
 		} else {
 			userID = result[0]['user_id'];
 
-			console.log(resut);
+			console.log(result[0]['properties']['phone']['value']);
 
 			var rand = parseInt(Math.random() * 10000);
 			var requestID = userID + "-" + rand;
@@ -75,7 +90,6 @@ app.post('/postToSlack/:key?', function(req, res) {
 				}]
 			}
 
-
 			var errorHandler = function(err){
 				if (err) {
 					console.log('API error:', err);
@@ -84,15 +98,13 @@ app.post('/postToSlack/:key?', function(req, res) {
 					res.redirect('/');
 				}
 			};
-
 			slack.send(fancyMessage, errorHandler);
 		}
     });
-
 });
 
 app.get('/login', function(req, res){
-	res.sendFile(path.join(__dirname+'/login.html'));
+	res.render('login');
 })
 
 
@@ -101,7 +113,7 @@ app.get('/:key?', function(req,res){
 	UserApp.setToken(req.params.key);
     UserApp.User.get({}, function(error, result){
 		if(!error){
-			res.sendFile(path.join(__dirname+'/index.html'));
+			res.render('index');
 		}else{
 			res.redirect('/login')
 		}
@@ -111,7 +123,7 @@ app.get('/:key?', function(req,res){
 
 app.get('/invite/:user', function(req, res){
 	// require login
-	res.sendFile(path.join(__dirname+'/invite.html'));
+	res.render('invite');
 })
 
 
