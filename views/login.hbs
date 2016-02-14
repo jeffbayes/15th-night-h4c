@@ -8,9 +8,9 @@
 <form class="form-signin" id="login">
 <h2 class="form-signin-heading">Please sign in</h2>
 <label for="inputEmail" class="sr-only">Email address</label>
-<input type="email" name="login" class="form-control" placeholder="Email address" required="" autofocus="" value="sally@gmail.com">
+<input type="email" name="login" class="form-control" placeholder="Email address" required="" autofocus="" value="sally@gmail.com" style="border-radius:4px 4px 0px 0px !important;">
 <label for="inputPassword" class="sr-only">Password</label>
-<input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required="" value="password">
+<input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required="" value="password" style="border-radius:0px 0px 4px 4px !important; position:relative; top:.1em;">
 <br>
 <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
 </form>
@@ -34,7 +34,7 @@
 		    } else {
 		        // User is logged in, save result.token in a cookie called 'ua_session_token'
 		        console.log(UserApp.User());
-		        window.location.href = '/'+ result.token
+		        window.location.href = '/request/'+ result.token
 		    }
 		});
 	 

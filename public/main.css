@@ -70,3 +70,7 @@ h3{
 .panel-title{
 	color:white;
 }
+
+h3 input{
+	display: none;
+}
