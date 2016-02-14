@@ -5,16 +5,9 @@ var express = require('express');
 var exphbs = require('express-handlebars');
 var path = require('path');
 var bodyParser = require('body-parser');
-
-<<<<<<< HEAD
-// Slack Dependencies
-=======
 var nodemailer = require('nodemailer');
 
-var MY_SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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';
-var slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
-// THIS IS BAD NAMESPACING. FIX IT LATER.
->>>>>>> 8d3efa113acf60a7968ea39cd7bdd03df06d646a
+// Slack Dependencies
 var Slack = require('slack-node');
 var SlackAPIToken = "xoxp-21255113202-21255543414-21308331154-232305f633"; // TODO: REPLACE. IT HAS SEEN A PUBLIC REPO.
 var SlackAPI = new Slack(SlackAPIToken);
