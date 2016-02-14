@@ -8,8 +8,11 @@ var bodyParser = require('body-parser');
 
 // Nodemailer and SMTP Dependencies
 var nodemailer = require('nodemailer');
-var transporter = nodemailer.createTransport('smtps://nwpointer%40gmail.com:RNs1120!!@smtp.gmail.com');
 var Slack = require('slack-api');
+
+var transporter = nodemailer.createTransport('smtps://nwpointer%40gmail.com:RNs1120!!@smtp.gmail.com'); 
+// TODO: LAUGH AT NATHAN FOR PUTTING HIS CREDENTIALS ON GITHUB
+
 
 // Slack Dependencies
 var Slack = require('slack-node');
@@ -54,7 +57,7 @@ app.get('/help/:id', function(req, res) {
 		} else {
 			console.log(error);
 			console.log("Uh oh, this doesn't work! /help/:id");
-			// TODO: Redirect to a 404 page.
+			res.redirect('/404/Request has already been satisfied. Thank you for helping!')
 		}
 	});
 });
@@ -215,8 +218,7 @@ app.post('/postToSlack/:key?', function(req, res) {
 	console.log(req.params.key);
     UserApp.User.get({}, function(error, result){
 		if(error){
-			// TODO: Error message for graceful handling.
-			res.redirect('/login');
+			res.redirect('/404/User authentication failed. Log out, log back in, and try again.');
 		} else {
 			userID = result[0]['user_id'];
 
@@ -289,7 +291,7 @@ app.post('/passwordReset', function(req, res){
 	}, function(error, result) {
 		if (error) {
 			console.log(error);
-			res.redirect("/login");
+			res.redirect("/404/The submitted login information was invalid.");
 		} else {
 			console.log(result); // expecting a password token
 
@@ -328,12 +330,10 @@ app.post('/changePassword', function(req, res){
 	}, function(error, result) {
 		if (error) {
 			console.log(error);
-			res.redirect('/resetPassword');
-			// TODO: HANDLE GRACEFULLY
+			res.redirect('/404/Password change failed. Please try again.');
 		} else {
 			console.log(result);
-			res.redirect('/login');
-			// TODO: Figure it out. Redirect somewhere with success message.
+			res.redirect('/success/Password successfully changed!');
 		}
 	})
 })
@@ -348,7 +348,7 @@ app.get('/request/:key?/:message?', function(req,res){
 		if (!error) {
 			res.render('request', {message: req.params.message});
 		} else {
-			res.redirect('/login')
+			res.redirect('/404/User authentication failed. Log out, log back in, and try again.')
 		}
     });
 });
@@ -359,7 +359,15 @@ app.get('/404/:message?', function(req, res){
 		message = req.params.message;
 	}
 	res.render('404', {message, message});
-})
+});
+
+app.get('/success/:message?', function(req, res){
+	var message;
+	if (req.params.message) {
+		message = req.params.message;
+	}
+	res.render('success', {message, message});
+});
 
 app.get('/', function(req,res){
 	res.render('index');
@@ -379,6 +387,10 @@ app.get('/invite/:key/:message?', function(req, res){
 			res.redirect('/');
 		}
 	});
+});
+
+app.get('*', function(req, res) {
+	res.render('index');
 });
 
 
