@@ -30,17 +30,21 @@ app.get('/help/:id', function(req, res) {
 	// slack oauth // stretch goal for now
 	// Pull the unique stuff out.
 	var requestID = req.params.id;
+	console.log(requestID);
 	var requestArray = requestID.split('-');
-	UserApp.User.get({user_id: requestArray[0]}, function(error, result){
+	console.log(requestArray[0])
+	// REPLACE BEFORE PRODUCTION. IT HAS SEEN THE LIGHT OF DAY.
+	UserApp.setToken("x-WrIq6UQC20sI2a-a8bMg");
+	UserApp.User.get({"user_id": requestArray[0]}, function(error, result){
 		if(error){
+			console.log(error);
 			console.log("Uh oh, this doesn't work! /help/:id");
 		} else {
-			userPhone = result[0]['properties']['phone']['value'];
-
+			var userPhone = result[0]['properties']['phone']['value'];
+			res.render('help', {phone: userPhone});
 		}
 
 	});
-	res.render('help');
 	// Parse into userID and request number.
 	// Search userapp for userid
 	// find request number
