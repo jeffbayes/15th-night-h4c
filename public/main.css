@@ -107,3 +107,10 @@ h3 input{
 	width: 250px;
 	text-align: center
 }
+
+b{
+	color:white;
+}
+p{
+	color:rgba(255,255,255,.5);
+}

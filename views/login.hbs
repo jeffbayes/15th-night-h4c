@@ -12,7 +12,7 @@
 <label for="inputPassword" class="sr-only">Password</label>
 <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required="" value="password" style="border-radius:0px 0px 4px 4px !important; position:relative; top:.1em;">
 <br>
-<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+<button id="submitbtn" class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
 </form>
 
 <div id="msg"></div>
@@ -21,8 +21,12 @@
 
 	$( "#login" ).submit(function( event ) {
 		var res =  $( this ).serializeArray();
-		console.log(res);
 		event.preventDefault();
+		// $("#submitbtn").html("loading...");
+		$("#submitbtn").html("loading");
+		setInterval(function(){
+			$("#submitbtn").append(".");
+		},500)
 		UserApp.User.login({ "login": res[0].value, "password": res[1].value }, function(error, result) {
 		    if (error) {
 		        // Something went wrong...

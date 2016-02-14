@@ -230,7 +230,7 @@
 	</div>
 	<div id="sticker">
 		<div class="container">
-			<input type="submit" class="btn btn-lg btn-primary btn-block">
+			<input type="submit" class="btn btn-lg btn-primary btn-block" value="make request">
 		</div>
 	</div>
 	
@@ -245,6 +245,22 @@ UserApp.initialize({ appId: "56bf8c06a0f39" });
 //     $('#sticker').stop().animate({bottom: 0}, 'slow');
 // });
 var config = {};
+
+$("form").on("submit", function(){
+	// var self = this;
+	$("#sticker input").attr("value", "loading");
+	setInterval(function(){
+		$("#sticker input").attr(
+			"value", 
+			$("#sticker input").attr("value") + "."
+		)
+	},500)
+})
+
+// $("#submitbtn").html("loading");
+// setInterval(function(){
+// 	$("#submitbtn").append(".");
+// },500)
 
 $('h3').each(function(i,h){
 	$(h).on("click", function(h){
