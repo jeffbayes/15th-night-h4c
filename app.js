@@ -358,7 +358,7 @@ app.get('/404/:message?', function(req, res){
 	if (req.params.message) {
 		message = req.params.message;
 	}
-	res.render('404', {message, message});
+	res.render('404', {message: message});
 });
 
 app.get('/success/:message?', function(req, res){
