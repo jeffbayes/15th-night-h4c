@@ -44,11 +44,11 @@ app.post('/postToSlack/:key?', function(req, res) {
 		} else {
 			userID = result[0]['user_id'];
 
-			console.log(resut);
+			// console.log(resut);
 
 			var rand = parseInt(Math.random() * 10000);
 			var requestID = userID + "-" + rand;
-			console.log(requestID);
+			// console.log(requestID);
 
 			var service = req.body.service;
 			var gender = req.body.gender;
@@ -56,6 +56,19 @@ app.post('/postToSlack/:key?', function(req, res) {
 			var push = "<!channel> -- ";
 			var fallbackText = push + "Service: ";
 			var basicText = service + ". " + gender + ", age " + age + ".";
+
+
+			var request = {id:rand, text: basicText};
+			var requests =JSON.parse(result[0].properties.requests.value);
+			requests.push(request);
+			
+			result[0].properties.requests.value = JSON.stringify(requests);
+
+			console.log(result[0].properties.requests.value);
+		
+			UserApp.User.save(result[0], function(error, result){
+				console.log(error, result);
+			})
 
 			var requestURL = "http://localhost:3000/help/" + requestID;
 			var extras = "\nFollow the link to accept the request: " + requestURL;
