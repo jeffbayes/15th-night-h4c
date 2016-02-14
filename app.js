@@ -366,7 +366,7 @@ app.get('/success/:message?', function(req, res){
 	if (req.params.message) {
 		message = req.params.message;
 	}
-	res.render('success', {message, message});
+	res.render('success', {message: message});
 });
 
 app.get('/', function(req,res){
