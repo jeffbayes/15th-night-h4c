@@ -70,9 +70,3 @@ h3{
 .panel-title{
 	color:white;
 }
-
-@media (min-width: 100px) {
-  .facet_sidebar {
-    display: none;
-  }
-}
