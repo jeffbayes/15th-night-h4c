@@ -126,14 +126,14 @@ app.post('/help/close/:id', function(req, res) {
 									console.log('API error:', err);
 								} else {
 									console.log('Message received!');
-									res.redirect('/');
 								}
 							};
 							slack.send(fancyMessage, errorHandler);
 						})
 						console.log(match);
 					});
-				}, 14000)
+				}, 14000);
+				res.redirect("/confirm/" + encodeURIComponent(userEmail) + "/" + encodeURIComponent(userPhone));
 			});
 
 
@@ -145,13 +145,13 @@ app.post('/help/close/:id', function(req, res) {
 
 	});
 
-	// result[0].properties.requests.value = JSON.stringify(requests);
+	
+})
 
-	// console.log(result[0].properties.requests.value);
-
-	// UserApp.User.save(result[0], function(error, result){
-	// 	console.log(error, result);
-	// })
+app.get("/confirm/:mail/:phone", function(req, res) {
+	console.log("=====================================");
+	console.log("=====================================");
+	res.redirect("/");
 })
 
 
