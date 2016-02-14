@@ -212,7 +212,7 @@ app.post('/postToSlack/:key?', function(req, res) {
 					console.log('API error:', err);
 				} else {
 					console.log('Message received!');
-					res.redirect('/');
+					res.redirect('/request/'+req.params.key+"/"+" message recieved");
 				}
 			};
 			slack.send(fancyMessage, errorHandler);
@@ -225,12 +225,12 @@ app.get('/login', function(req, res){
 })
 
 
-app.get('/request/:key?', function(req,res){
+app.get('/request/:key?/:message?', function(req,res){
 
 	UserApp.setToken(req.params.key);
     UserApp.User.get({}, function(error, result){
 		if(!error){
-			res.render('request');
+			res.render('request', {message: req.params.message});
 		}else{
 			res.redirect('/login')
 		}
