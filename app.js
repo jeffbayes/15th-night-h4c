@@ -6,7 +6,15 @@ var exphbs = require('express-handlebars');
 var path = require('path');
 var bodyParser = require('body-parser');
 
+<<<<<<< HEAD
 // Slack Dependencies
+=======
+var nodemailer = require('nodemailer');
+
+var MY_SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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';
+var slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
+// THIS IS BAD NAMESPACING. FIX IT LATER.
+>>>>>>> 8d3efa113acf60a7968ea39cd7bdd03df06d646a
 var Slack = require('slack-node');
 var SlackAPIToken = "xoxp-21255113202-21255543414-21308331154-232305f633"; // TODO: REPLACE. IT HAS SEEN A PUBLIC REPO.
 var SlackAPI = new Slack(SlackAPIToken);
@@ -53,6 +61,34 @@ app.get('/help/:id', function(req, res) {
 		}
 	});
 });
+
+app.get('/msg', function(req,res){
+	return res.render('msg', {});
+})
+
+app.post('/msg', function(req,res){
+	var p = req.body;
+	// Use Smtp Protocol to send Email
+    var transporter = nodemailer.createTransport('smtps://nwpointer%40gmail.com:RNs1120!!@smtp.gmail.com');
+
+    // setup e-mail data with unicode symbols
+    var mailOptions = {
+        from: '15th night provider', // sender address
+        to: p.email, // list of receivers
+        subject: p.subject, // Subject line
+        text: p.message, // plaintext body
+        
+    };
+
+    // send mail with defined transport object
+    transporter.sendMail(mailOptions, function(error, info){
+        if(error){
+            return console.log(error);
+        }
+        console.log('Message sent: ' + info.response);
+    });
+	return res.redirect(p.location)
+})
 
 // Helper function to remove undefined items from an array.
 // Used to close help requests.
@@ -230,9 +266,15 @@ app.get('/', function(req,res){
 	res.render('index');
 });
 
-app.get('/invite/:user', function(req, res){
-	// require login
-	res.render('invite');
+app.get('/invite/:key', function(req, res){
+	UserApp.setToken(req.params.key);
+	UserApp.User.get({},function(error,result){
+		if(result && result[0] && result[0].permissions.admin.value){
+			res.render('invite');
+		}else{
+			res.redirect('/');
+		}
+	});
 });
 
 
