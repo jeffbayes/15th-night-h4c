@@ -1,32 +1,12 @@
-
-<h3>Information</h3>
-<p>{{info}}</p>
-<form id="close" action="close" method="post">
-	<input name="phone" type="hidden" value="{{phone}}">
-	<input name="email" type="hidden" value="{{email}}">
-	<input class="btn btn-lg btn-primary" type="submit" value="YES, I CAN HELP!" color="green">
-	<button class="btn btn-lg btn-warning" onclick="window.close();">I can't help.</button>
-</form>
+<h1>CONFIRMATION</h1>
 <br>
-<br><br>
+<p class="tall">Thank you for responding to help an at-risk youth. Here is the relevant information again:</p>
+<p class="supertall">{{info}}</p>
 
-<h4>Next Steps:</h4>
-If you are able to help, but cannot call right away, please send a quick confirmation email with your contact information.
-<br><br>
-User Phone: {{phone}} <br>
-User Email: <a href="mailto:{{email}}">{{email}}</a>
-
-
-
-<script>
-var getToken = function(source){
-	var components = (source.split('/'));
-	return components[components.length-1];
-}
-
-console.log(getToken(window.location.href))
-$('#close').attr(
-	"action", 
-	$('#close').attr('action') + "/" + getToken(window.location.href)
-)
-</script>
+<h3>Next Steps:</h3>
+You can get in contact with this youth by either calling or emailing.<br>
+<p class="supertall">
+	Phone: {{phone}}<br>
+	Email: <a href="mailto:{{email}}">{{email}}</a>
+</p>
+<em>If you cannot call right away, please send them quick email with your contact information.</em>

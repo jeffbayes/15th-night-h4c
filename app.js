@@ -71,31 +71,31 @@ function cleanArray(actual) {
 }
 
 app.post('/help/close/:id', function(req, res) {
+	var userEmail, userPhone, requestText;
 	var requestID = req.params.id;
-	console.log(requestID);
 	var requestArray = requestID.split('-');
-	console.log(requestArray[0]);
-	console.log(requestArray[1]);
+
 	// REPLACE BEFORE PRODUCTION. IT HAS SEEN THE LIGHT OF DAY.
 	UserApp.setToken("x-WrIq6UQC20sI2a-a8bMg");
+
 	UserApp.User.get({"user_id": requestArray[0]}, function(error, result){
 		if(!error) {
 			console.log(result[0])
-			var userEmail = result[0]['email']
-			var userPhone = result[0]['properties']['phone']['value'];
+			userEmail = result[0]['email']
+			userPhone = result[0]['properties']['phone']['value'];
 			var userRequests = JSON.parse(result[0]['properties']['requests']['value']);
-			console.log(userRequests)
+
 			var removeRequests = userRequests.map(function(item){
 				if (item['id'] == requestArray[1]){
-					// Don't return it
+					requestText = item['text'];	
 				} else { return item; }
 			});
 			var updatedRequests = cleanArray(removeRequests);
 			result[0].properties.requests.value = JSON.stringify(updatedRequests);
 			UserApp.User.save(result[0], function(error, result){
-				console.log(error, result);
-				console.log("REQUEST ID: ", requestID);
+
 				// BRING BACK TIMEOUT FOR PRODUCTION. A QUICK RESPONSE DOESN'T WORK FOR SLACK.
+				// MAYBE REMOVE FOR DEMO.
 				setTimeout(function() {
 					SlackAPI.api('search.messages', { 
 						query: requestID
@@ -133,25 +133,27 @@ app.post('/help/close/:id', function(req, res) {
 						console.log(match);
 					});
 				}, 14000);
-				res.redirect("/confirm/" + encodeURIComponent(userEmail) + "/" + encodeURIComponent(userPhone));
+				res.redirect("/confirm/" + encodeURIComponent(userEmail) + "/" + encodeURIComponent(userPhone)
+					+ "/" + encodeURIComponent(requestText));
 			});
-
-
-			// res.render('help', {phone: userPhone, email: userEmail});
 		} else {
 			console.log(error);
 			console.log("Uh oh, this doesn't work! /help/close/:id");
 		}
-
 	});
-
-	
 })
 
-app.get("/confirm/:mail/:phone", function(req, res) {
+app.get("/confirm/:mail/:phone/:info", function(req, res) {
+	var encodedEmail = req.params.mail;
+	var encodedPhone = req.params.phone;
+	var encodedInfo = req.params.info;
+	var email = decodeURIComponent(encodedEmail);
+	var phone = decodeURIComponent(encodedPhone);
+	var info = decodeURIComponent(encodedInfo);
+	res.render('helpConfirm', {email: email, phone: phone, info: info})
 	console.log("=====================================");
 	console.log("=====================================");
-	res.redirect("/");
+	// res.redirect("/");
 })
 
 
