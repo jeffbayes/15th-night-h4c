@@ -114,3 +114,10 @@ b{
 p{
 	color:rgba(255,255,255,.5);
 }
+
+.confirm-icon{
+	height: 6rem;
+	position: relative;
+	top: -1.70rem;
+	margin-right: 1rem;
+}

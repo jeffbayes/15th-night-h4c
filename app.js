@@ -5,6 +5,8 @@ var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser');
 
+var nodemailer = require('nodemailer');
+
 var MY_SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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';
 var slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
 // THIS IS BAD NAMESPACING. FIX IT LATER.
@@ -54,6 +56,34 @@ app.get('/help/:id', function(req, res) {
 
 	});
 });
+
+app.get('/msg', function(req,res){
+	return res.render('msg', {});
+})
+
+app.post('/msg', function(req,res){
+	var p = req.body;
+	// Use Smtp Protocol to send Email
+    var transporter = nodemailer.createTransport('smtps://nwpointer%40gmail.com:RNs1120!!@smtp.gmail.com');
+
+    // setup e-mail data with unicode symbols
+    var mailOptions = {
+        from: '15th night provider', // sender address
+        to: p.email, // list of receivers
+        subject: 'confirmation ✔', // Subject line
+        text: p.message, // plaintext body
+        
+    };
+
+    // send mail with defined transport object
+    transporter.sendMail(mailOptions, function(error, info){
+        if(error){
+            return console.log(error);
+        }
+        console.log('Message sent: ' + info.response);
+    });
+	return res.redirect(p.location)
+})
 
 function cleanArray(actual) {
   var newArray = new Array();
@@ -234,9 +264,17 @@ app.get('/', function(req,res){
 })
 
 
-app.get('/invite/:user', function(req, res){
+app.get('/invite/:key', function(req, res){
+	UserApp.setToken(req.params.key);
+	UserApp.User.get({},function(error,result){
+		if(result && result[0] && result[0].permissions.admin.value){
+			res.render('invite');
+		}else{
+			res.redirect('/');
+		}
+	})
 	// require login
-	res.render('invite');
+	
 })
 
 

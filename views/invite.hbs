@@ -1,17 +1,21 @@
-
-<h1 class="text-center">15th Night</h1>
-invite:
-<form id="signup">
-	<input type="text" name="text" value="asdfasdf">
-	<input type="email" name="email" value="test@gmail.com">
-	<input type="submit">
+<br>
+<h1 class="text-center">Member invite</h1>
+<br>
+<form id="signup" action="/msg" method="POST" class="col-md-8 col-md-offset-2">
+	<label for="usr">Name:*</label>
+	<input required="true" type="text" placeholder="Jame Doe" name="email" class="form-control" id="usr">
+	<br>
+	<label for="usr">Email:*</label>
+	<input required="true" type="email" placeholder="name@mail.com" name="email" class="form-control" id="usr">
+	<br>
+	<label for="usr">Optional message:</label>
+	<textarea class="form-control" name="message" rows="5" placeholder="message body"></textarea>
+	<br><br>
+	<input class="btn btn-lg btn-primary" type="submit" value="send invite">
 </form>
 
 <script>
-UserApp.initialize({ appId: "56bf8c06a0f39" });
-var config = {};
 
-	
 $( "#signup" ).submit(function( event ) {
 	var res =  $( this ).serializeArray();
 	console.log(res);
@@ -21,14 +25,6 @@ $( "#signup" ).submit(function( event ) {
 	  "email": res[1].value,
 	  "login": res[1].value,
 	  "password": "password"
-	  "properties": {
-	      phone:"5555555555"
-	  },
-	  // "subscription": {
-	  //     "price_list_id": "qcRTCZiKajkbl-kNATL1vk",
-	  //     "plan_id": "j5V9j7jBdJuCEMkBXseLfm",
-	  //     "override": false
-	  // }
 	}, function(err, res){
 	 	console.log(err, res);
 	});

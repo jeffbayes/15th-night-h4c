@@ -17,7 +17,6 @@
 
 <div id="msg"></div>
 	<script>
-	UserApp.initialize({ appId: "56bf8c06a0f39" });
 
 	$( "#login" ).submit(function( event ) {
 		var res =  $( this ).serializeArray();
@@ -26,7 +25,7 @@
 		$("#submitbtn").html("loading");
 		setInterval(function(){
 			$("#submitbtn").append(".");
-		},500)
+		},600)
 		UserApp.User.login({ "login": res[0].value, "password": res[1].value }, function(error, result) {
 		    if (error) {
 		        // Something went wrong...
@@ -37,7 +36,14 @@
 		        $('#msg').html('locked')
 		    } else {
 		        // User is logged in, save result.token in a cookie called 'ua_session_token'
-		        console.log(UserApp.User());
+		        // console.log(UserApp.User());
+		        console.log(result);
+		        UserApp.setToken(result.token);
+		        UserApp.User.get({},function(error,result){
+		        	setCookie("nightAdmin", result[0].permissions.admin.value, 1);
+		        })
+		        setCookie("nightUserToken", result.token, 1);
+		        
 		        window.location.href = '/request/'+ result.token
 		    }
 		});
