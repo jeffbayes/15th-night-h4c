@@ -70,7 +70,7 @@ app.post('/msg', function(req,res){
     var mailOptions = {
         from: '15th night provider', // sender address
         to: p.email, // list of receivers
-        subject: 'confirmation ✔', // Subject line
+        subject: p.subject, // Subject line
         text: p.message, // plaintext body
         
     };
