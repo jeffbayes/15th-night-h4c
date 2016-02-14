@@ -37,9 +37,18 @@ app.set('view engine', '.hbs');
 // Routes
 app.use(express.static(path.join(__dirname, 'public')));
 
+var setCharAt = function(str,index,chr) {
+    if(index > str.length-1) return str;
+    return str.substr(0,index) + chr + str.substr(index+1);
+}
+
 app.get('/help/:id', function(req, res) {
+	var userEmail, userPhone, requestText;
 	var requestID = req.params.id;
-	var requestArray = requestID.split('-');
+	var dashIndex = requestID.lastIndexOf('-');
+	var newString = setCharAt(requestID, dashIndex, ' ');
+	console.log(newString[dashIndex]);
+	var requestArray = newString.split(' ');
 
 	UserApp.setToken(UserAppToken);
 	UserApp.User.get({"user_id": requestArray[0]}, function(error, result){
@@ -135,7 +144,10 @@ function cleanArray(actual) {
 app.post('/help/close/:id', function(req, res) {
 	var userEmail, userPhone, requestText;
 	var requestID = req.params.id;
-	var requestArray = requestID.split('-');
+	var dashIndex = requestID.lastIndexOf('-');
+	var newString = setCharAt(requestID, dashIndex, ' ');
+	console.log(newString[dashIndex]);
+	var requestArray = newString.split(' ');
 
 	UserApp.setToken(UserAppToken);
 	UserApp.User.get({"user_id": requestArray[0]}, function(error, result){
