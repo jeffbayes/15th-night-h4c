@@ -24,10 +24,11 @@ var exphbs = require('express-handlebars');
 //Initilization
 var app = express();
 app.use(bodyParser.urlencoded({extended: true})); // to support URL-encoded bodies
-app.engine('.hbs', exphbs({extname: '.hbs'}));
+app.engine('.hbs', exphbs({extname: '.hbs', defaultLayout: 'main'}));
 app.set('view engine', '.hbs');
 
 //routes
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/help/:id', function(req, res) {
 	// slack oauth // stretch goal for now
