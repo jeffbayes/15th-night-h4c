@@ -1,72 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-	<style>
-	.container-narrow {
-	  margin: 0 auto;
-	  max-width: 700px;
-	}
-	.container-narrow > hr {
-	  margin: 30px 0;
-	}
-	</style>
-	<script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-	<script src="https://app.userapp.io/js/userapp.client.js"></script>
-</head>
-<body class="container">
-
-	<h1 class="text-center">15th Night</h1>
-	<form id="request" action="postToSlack" method="post">
-		<div class="row">
-			<div class="col-md-4">
-				<h2 class="text-center">Service</h2>
-				<input name="service" type="radio" value="Shelter"> Shelter <br>
-				<input name="service" type="radio" value="Food"> Food <br>
-				<input name="service" type="radio" value="Transportation"> Transportation <br>
-				<input name="service" type="radio" value="Mental Health"> Mental Health <br>
-				<input name="service" type="radio" value="Physical Health"> Physical Health <br>
-				<input name="service" type="radio" value="Drug Mediation"> Drug Mediation <br>
-				<input name="service" type="radio" value="Counseling"> Counseling <br>
-				<input name="service" type="radio" value="Basic Needs"> Basic Needs <br>
-				<input name="service" type="radio" value="Other"> Other <br>
-			</div>
-
-			<div class="col-md-4">
-				<h2 class="text-center">Gender</h2>
-				<input name="gender" type="radio" value="Male"> Male <br>
-				<input name="gender" type="radio" value="Female"> Female <br>
-				<input name="gender" type="radio" value="Other"> Other <br>
-			</div>
-
-			<div class="col-md-4">
-				<h2 class="text-center">Age</h2>
-				<input name="age" type="radio" value="5-8"> 5-8 <br>
-				<input name="age" type="radio" value="8-11"> 8-11 <br>
-				<input name="age" type="radio" value="11-14"> 11-14 <br>
-				<input name="age" type="radio" value="14-18"> 14-18 <br>
-				<input name="age" type="radio" value="18+"> 18+ <br>
-			</div>
+<h1 class="text-center">15th Night</h1>
+<form id="request" action="postToSlack" method="post">
+	<div class="row">
+		<div class="col-md-4">
+			<h2 class="text-center">Service</h2>
+			<input name="service" type="radio" value="Shelter"> Shelter <br>
+			<input name="service" type="radio" value="Food"> Food <br>
+			<input name="service" type="radio" value="Transportation"> Transportation <br>
+			<input name="service" type="radio" value="Mental Health"> Mental Health <br>
+			<input name="service" type="radio" value="Physical Health"> Physical Health <br>
+			<input name="service" type="radio" value="Drug Mediation"> Drug Mediation <br>
+			<input name="service" type="radio" value="Counseling"> Counseling <br>
+			<input name="service" type="radio" value="Basic Needs"> Basic Needs <br>
+			<input name="service" type="radio" value="Other"> Other <br>
 		</div>
-		<br><br>
-		<input type="submit">
-	</form>
-	<script>
-	UserApp.initialize({ appId: "56bf8c06a0f39" });
-	var config = {};
 
-	var getToken = function(source){
-		var components = (source.split('/'));
-		return components[components.length-1];
-	}
+		<div class="col-md-4">
+			<h2 class="text-center">Gender</h2>
+			<input name="gender" type="radio" value="Male"> Male <br>
+			<input name="gender" type="radio" value="Female"> Female <br>
+			<input name="gender" type="radio" value="Other"> Other <br>
+		</div>
 
-	console.log(getToken(window.location.href))
-	$('#request').attr(
-		"action", 
-		$('#request').attr('action') + "/" + getToken(window.location.href)
-	)
-	</script>
-</body>
-</html>
+		<div class="col-md-4">
+			<h2 class="text-center">Age</h2>
+			<input name="age" type="radio" value="5-8"> 5-8 <br>
+			<input name="age" type="radio" value="8-11"> 8-11 <br>
+			<input name="age" type="radio" value="11-14"> 11-14 <br>
+			<input name="age" type="radio" value="14-18"> 14-18 <br>
+			<input name="age" type="radio" value="18+"> 18+ <br>
+		</div>
+	</div>
+	<br><br>
+	<input type="submit">
+</form>
+<script>
+UserApp.initialize({ appId: "56bf8c06a0f39" });
+var config = {};
+
+var getToken = function(source){
+	var components = (source.split('/'));
+	return components[components.length-1];
+}
+
+console.log(getToken(window.location.href))
+$('#request').attr(
+	"action", 
+	$('#request').attr('action') + "/" + getToken(window.location.href)
+)
+</script>
