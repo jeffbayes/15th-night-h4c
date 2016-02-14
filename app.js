@@ -5,7 +5,10 @@ var express = require('express');
 var exphbs = require('express-handlebars');
 var path = require('path');
 var bodyParser = require('body-parser');
+
+// Nodemailer and SMTP Dependencies
 var nodemailer = require('nodemailer');
+var transporter = nodemailer.createTransport('smtps://nwpointer%40gmail.com:RNs1120!!@smtp.gmail.com');
 var Slack = require('slack-api');
 
 // Slack Dependencies
@@ -86,8 +89,7 @@ app.get('/catcher', function(){
 
 app.post('/msg', function(req,res){
 	var p = req.body;
-	// Use Smtp Protocol to send Email
-    var transporter = nodemailer.createTransport('smtps://nwpointer%40gmail.com:RNs1120!!@smtp.gmail.com');
+	
 
 
 	if(p.addendum){
@@ -273,6 +275,69 @@ app.post('/postToSlack/:key?', function(req, res) {
     });
 });
 
+app.get('/resetPassword', function(req,res) {
+	res.render('resetPassword');
+});
+
+app.post('/passwordReset', function(req, res){
+	console.log("Before Reset");
+	var email = req.body.email;
+	console.log(email);
+	UserApp.setToken(UserAppToken);
+	UserApp.User.resetPassword({
+		"login": email
+	}, function(error, result) {
+		if (error) {
+			console.log(error);
+			res.redirect("/login");
+		} else {
+			console.log(result); // expecting a password token
+
+			var message1 = "Hi, you have initiated a password change or password recovery.<br>";
+			var message2 = "Your password token is: " +  result['password_token'] + "<br>";
+			var message3 = "For your security, complete the password change as soon as possible. Thank you!<br>";
+			var finalMessage = message1 + message2 + message3;
+			var mailOptions = {
+		        from: '15th Night Network', // sender address
+		        to: email, // list of receivers
+		        subject: "15th Night: Temporary Password", // Subject line
+		        html: finalMessage // plaintext body
+		    };
+		    transporter.sendMail(mailOptions, function(error, info){
+		        if (error) {
+		            return console.log(error);
+		        }
+		    	console.log('Message sent: ' + info.response);
+		    });	
+		    res.redirect('/changePassword');
+		}
+	});
+});
+
+app.get('/changePassword', function(req, res){
+	res.render('changePassword');
+});
+
+app.post('/changePassword', function(req, res){
+	var token = req.body.token;
+	var password = req.body.password;
+	console.log(password);
+	UserApp.User.changePassword({
+		"new_password": password,
+		"password_token": token
+	}, function(error, result) {
+		if (error) {
+			console.log(error);
+			res.redirect('/resetPassword');
+			// TODO: HANDLE GRACEFULLY
+		} else {
+			console.log(result);
+			res.redirect('/login');
+			// TODO: Figure it out. Redirect somewhere with success message.
+		}
+	})
+})
+
 app.get('/login', function(req, res){
 	res.render('login');
 });
@@ -287,6 +352,14 @@ app.get('/request/:key?/:message?', function(req,res){
 		}
     });
 });
+
+app.get('/404/:message?', function(req, res){
+	var message;
+	if (req.params.message) {
+		message = req.params.message;
+	}
+	res.render('404', {message, message});
+})
 
 app.get('/', function(req,res){
 	res.render('index');
