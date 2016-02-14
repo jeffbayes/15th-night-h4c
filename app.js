@@ -126,7 +126,7 @@ app.post('/help/close/:id', function(req, res) {
 									console.log('API error:', err);
 								} else {
 									console.log('Message received!');
-									res.redirect('/');
+									res.redirect('/request');
 								}
 							};
 							slack.send(fancyMessage, errorHandler);
@@ -223,17 +223,21 @@ app.get('/login', function(req, res){
 })
 
 
-app.get('/:key?', function(req,res){
+app.get('request/:key?', function(req,res){
 
 	UserApp.setToken(req.params.key);
     UserApp.User.get({}, function(error, result){
 		if(!error){
-			res.render('index');
+			res.render('request');
 		}else{
 			res.redirect('/login')
 		}
     })	
 });
+
+app.get('/', function(req,res){
+	res.render('index');
+})
 
 
 app.get('/invite/:user', function(req, res){
