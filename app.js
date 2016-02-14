@@ -223,7 +223,7 @@ app.get('/login', function(req, res){
 })
 
 
-app.get('request/:key?', function(req,res){
+app.get('/request/:key?', function(req,res){
 
 	UserApp.setToken(req.params.key);
     UserApp.User.get({}, function(error, result){
