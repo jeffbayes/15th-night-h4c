@@ -13,9 +13,14 @@ UserApp.initialize({
 	appId: "56bf8c06a0f39"
 });
 
+var handlebars = require('handlebars');
+var exphbs = require('express-handlebars');
+
 //Initilization
 var app = express();
 app.use(bodyParser.urlencoded({extended: true})); // to support URL-encoded bodies
+app.engine('.hbs', exphbs({extname: '.hbs'}));
+app.set('view engine', '.hbs');
 
 
 
@@ -24,8 +29,22 @@ app.use(bodyParser.urlencoded({extended: true})); // to support URL-encoded bodi
 app.get('/help/:id', function(req, res) {
 	// slack oauth // stretch goal for now
 	// Pull the unique stuff out.
-	var id = req.params.id;
-	res.sendFile(path.join(__dirname+'/help.html'));
+	var requestID = req.params.id;
+	console.log(requestID);
+	var requestArray = requestID.split('-');
+	console.log(requestArray[0])
+	// REPLACE BEFORE PRODUCTION. IT HAS SEEN THE LIGHT OF DAY.
+	UserApp.setToken("x-WrIq6UQC20sI2a-a8bMg");
+	UserApp.User.get({"user_id": requestArray[0]}, function(error, result){
+		if(error){
+			console.log(error);
+			console.log("Uh oh, this doesn't work! /help/:id");
+		} else {
+			var userPhone = result[0]['properties']['phone']['value'];
+			res.render('help', {phone: userPhone});
+		}
+
+	});
 	// Parse into userID and request number.
 	// Search userapp for userid
 	// find request number
@@ -44,11 +63,8 @@ app.post('/postToSlack/:key?', function(req, res) {
 		} else {
 			userID = result[0]['user_id'];
 
-			// console.log(resut);
-
 			var rand = parseInt(Math.random() * 10000);
 			var requestID = userID + "-" + rand;
-			// console.log(requestID);
 
 			var service = req.body.service;
 			var gender = req.body.gender;
@@ -88,7 +104,6 @@ app.post('/postToSlack/:key?', function(req, res) {
 				}]
 			}
 
-
 			var errorHandler = function(err){
 				if (err) {
 					console.log('API error:', err);
@@ -97,15 +112,13 @@ app.post('/postToSlack/:key?', function(req, res) {
 					res.redirect('/');
 				}
 			};
-
 			slack.send(fancyMessage, errorHandler);
 		}
     });
-
 });
 
 app.get('/login', function(req, res){
-	res.sendFile(path.join(__dirname+'/login.html'));
+	res.render('login');
 })
 
 
@@ -114,7 +127,7 @@ app.get('/:key?', function(req,res){
 	UserApp.setToken(req.params.key);
     UserApp.User.get({}, function(error, result){
 		if(!error){
-			res.sendFile(path.join(__dirname+'/index.html'));
+			res.render('index');
 		}else{
 			res.redirect('/login')
 		}
@@ -124,7 +137,7 @@ app.get('/:key?', function(req,res){
 
 app.get('/invite/:user', function(req, res){
 	// require login
-	res.sendFile(path.join(__dirname+'/invite.html'));
+	res.render('invite');
 })
 
 
